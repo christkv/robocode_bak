@@ -1,0 +1,25 @@
+{
+  "name": "robocode",
+  "version": "0.0.1",
+  "description": "Robocode implementation",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:christkv/robocode-js.git"
+  },
+  "devDependencies": {
+    "nodeunit": "latest"
+  },
+  "keywords": [
+    "robocode",
+    "game"
+  ],
+  "author": "Christian Kvalheim",
+  "license": "Apache"
+}
