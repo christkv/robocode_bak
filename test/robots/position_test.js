@@ -1,4 +1,6 @@
 var inherits = require('util').inherits,
+  fs = require('fs'),
+  RobotSpecification = require('../../lib/engine/repository_manager').RobotSpecification,
   RobocodeEngine = require('../../lib/engine/robocode_engine').RobocodeEngine,
   BattleAdaptor = require('../../lib/adaptors/battle_adaptor').BattleAdaptor,
   BattlefieldSpecification = require('../../lib/specifications/battlefield_specification').BattlefieldSpecification,
@@ -14,9 +16,22 @@ exports.tearDown = function(callback) {
 
 // Test the error reporting functionality
 exports["Should correctly test the position of two tanks"] = function(test) {
+  // Var create robot specifications
+  var crazyBot = fs.readFileSync("./test/robots/test_robots/crazy.js", "ascii");
+  var targetBot = fs.readFileSync("./test/robots/test_robots/target.js", "ascii");
+  // Create specifications
+  var crazySpecification = new RobotSpecification(crazyBot, "crazy", "christian kvalheim", "1.0", "1.0", "Crazy", "crazy robot");
+  var targetSpecification = new RobotSpecification(targetBot, "target", "christian kvalheim", "1.0", "1.0", "Target", "target robot");
+
+  // specification, name, author, version, robocodeVersion, fullClassName, description
   // The test
   var TestPosition = function() {
-    RobocodeTestBed.call(this);
+    RobocodeTestBed.call(this, {
+      refresh: function() {},
+      loadSelectedRobots: function(selectedRobots) {
+        return [crazySpecification, targetSpecification];
+      }
+    });
   }
 
   // Inherit basics
@@ -66,7 +81,7 @@ exports["Should correctly test the position of two tanks"] = function(test) {
 /***********************************************************************
  *  Robocode test bed
  **********************************************************************/
-var RobocodeTestBed = function RobocodeTestBed() {
+var RobocodeTestBed = function RobocodeTestBed(sourceAdapter) {
   BattleAdaptor.call(this);
 
   var self = this;
@@ -88,7 +103,7 @@ var RobocodeTestBed = function RobocodeTestBed() {
     self.errors = self.errors +  1;
   }
   // Create an engine
-  this.engine = new RobocodeEngine(battleAdaptor);
+  this.engine = new RobocodeEngine(battleAdaptor, sourceAdapter);
 }
 
 // Inherit basics
@@ -140,7 +155,6 @@ RobocodeTestBed.prototype.run = function run() {
 
 RobocodeTestBed.prototype.runBattle = function runBattle(robotList, numRounds, initialPositions) {
   var robotSpecifications = this.engine.getLocalRepository(robotList);
-
   if (this.getExpectedRobotCount(robotList) > 0) {
     // New battle specification
     var specification = new BattleSpecification(numRounds, this.battleFieldSpec, robotSpecifications);
